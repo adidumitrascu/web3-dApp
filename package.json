@@ -9,8 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "bulma": "^0.9.4",
+    "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "next": "latest"
+    "sass": "^1.68.0"
   }
 }
