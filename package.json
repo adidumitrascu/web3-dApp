@@ -13,6 +13,7 @@
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "sass": "^1.68.0"
+    "sass": "^1.68.0",
+    "web3": "^4.1.2"
   }
 }

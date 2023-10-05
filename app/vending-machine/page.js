@@ -1,4 +1,5 @@
 import styles from './vending-machine.module.css'
+import Web3 from 'web3'
 import 'bulma/css/bulma.css'
 
 
@@ -8,7 +9,7 @@ export default function VendingMachine() {
         <nav className="navbar mt-4 mb-4">
           <div className="container">
             <div className="navbar-brand">
-              <h1>Vending Machine</h1>
+              <h1 className={styles.h1}>Vending Machine</h1>
             </div>
             <div className='navbar-end'>
               <button className='button is-primary'>Connect Wallet</button>
