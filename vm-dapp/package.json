@@ -1,0 +1,21 @@
+{
+  "name": "web3-dapp",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "compile": "solcjs --abi --include-path node_modules/ --base-path . blockchain/contracts/VendingMachine.sol --output-dir blockchain/build"
+  },
+  "dependencies": {
+    "bulma": "^0.9.4",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "sass": "^1.68.0",
+    "solc": "^0.8.11",
+    "web3": "^1.10.2"
+  }
+}
