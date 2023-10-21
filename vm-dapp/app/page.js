@@ -1,95 +1,121 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client"
+import { useState, useEffect } from 'react'
+import Web3 from 'web3'
+import vendingMachineContract from '../blockchain/vending'
+import 'bulma/css/bulma.css'
+import styles from './vending-machine.module.css'
 
-export default function Home() {
+export default function VendingMachine() {
+  
+  const [error, setError] = useState('')
+  const [inventory, setInventory] = useState('')
+  const [successMsg, setSuccessMsg] = useState('')
+  const [myDonutsCount, setMyDonutsCount] = useState('')
+  const [buyCount, setBuyCount] = useState('')
+  const [web3, setWeb3] = useState(null)
+  const [address, setAddress] = useState(null)
+  const [vmContract, setVmContract] = useState(null)
+  const [purchases, setPurchases] = useState(0)
+
+  useEffect(() => {
+    if(vmContract) getInventoryHandler()
+    if(vmContract && address) getMyDonutsHandler()
+  }, [vmContract, address, purchases])
+  
+  const getInventoryHandler = async () => {
+    const inventory = await vmContract.methods.getVendingMachineBalance().call()
+    setInventory(inventory)
+  }
+
+  const getMyDonutsHandler = async () => {
+    const count = await vmContract.methods.donutBalances(address).call()
+    setMyDonutsCount(count)
+  }
+  
+  const updateDonutQty = event => {
+    setBuyCount(event.target.value)
+  }
+
+  const buyDonutsHandler = async () => {
+
+    try {
+      await vmContract.methods.purchase(buyCount).send({
+        from: address,
+        value: web3.utils.toWei('0.001', 'ether') * buyCount,
+        gasLimit: 3000000,
+        gasPrice: null
+      })
+      setPurchases(purchases+1)
+      setSuccessMsg(`${buyCount}'donuts purchased!'`)
+    } catch(err){
+      setError(err.message)
+    }
+  }
+  
+  const connectWalletHandler = async () => {
+    if(typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
+      try{
+        await window.ethereum.request({method: "eth_requestAccounts"})
+        const web3 = new Web3(window.ethereum)
+        setWeb3(web3)
+        const accounts = await web3.eth.getAccounts()
+        const vm = vendingMachineContract(web3)
+        setVmContract(vm)
+        setAddress(accounts[0])
+      } catch(err) {
+        setError(err.message)
+      }
+    } else {
+        console.log("Plase install MetaMask")
+    }
+  }
+  
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+      <div className={styles.main}>
+        <nav className="navbar mt-4 mb-4">
+          <div className="container">
+            <div className="navbar-brand">
+              <h1 className={styles.h1}>Vending Machine</h1>
+            </div>
+            <div className='navbar-end'>
+              <button onClick={connectWalletHandler} className='button is-primary'>Connect Wallet</button>
+            </div>
+          </div>
+        </nav>
+        <section className={styles.section}>
+          <div className='container'>
+            <h2>Vending machine inventory: {inventory.toString()}</h2>
+          </div>
+        </section>
+        <section className={styles.section}>
+          <div className='container'>
+            <h2>My donuts: {myDonutsCount.toString()}</h2>
+          </div>
+        </section>
+        <section className={styles.section}>
+          <div className='container mt-5'>
+            <div className="field">
+              <label className="label">Buy donuts</label>
+              <div className="control">
+                <input onChange={updateDonutQty} className="input" type="type" placeholder="Enter amount..."/>
+              </div>
+              <button onClick={buyDonutsHandler} className='button is-primary mt-2'>Buy</button>
+            </div>
+          </div>
+        </section>
+        <section className={styles.section}>
+          <div className='container has-text-danger'>
+            <p>{error}</p>
+          </div>
+        </section>
+        <section className={styles.section}>
+          <div className='container has-text-success'>
+            <p>{successMsg}</p>
+          </div>
+        </section>
       </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    )
 }
+  
+
+// export default VendingMachine

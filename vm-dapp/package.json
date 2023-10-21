@@ -7,10 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "export": "next export",
     "compile": "solcjs --abi --include-path node_modules/ --base-path . blockchain/contracts/VendingMachine.sol --output-dir blockchain/build"
   },
   "dependencies": {
     "bulma": "^0.9.4",
+    "node": "latest",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
